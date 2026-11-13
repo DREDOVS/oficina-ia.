@@ -60,20 +60,20 @@ Fecha UTC: $stamp.
 
 **Mantener este repositorio PRIVADO.**
 
-Archivo: `$encrypted`.
-SHA-256 antes de cifrar: `$EXPECTED_SHA`.
-SHA-256 cifrado: `$(sha256sum "$temp/$encrypted" | awk '{print $1}')`.
+Archivo: \`$encrypted\`.
+SHA-256 antes de cifrar: \`$EXPECTED_SHA\`.
+SHA-256 cifrado: \`$(sha256sum "$temp/$encrypted" | awk '{print $1}')\`.
 
 Cifrado: OpenSSL AES-256-CBC, PBKDF2, 600000 iteraciones, salt.
 La clave se guarda SOLO en el Codespace, en:
-`$keyfile`
+\`$keyfile\`
 Debe descargarse a un lugar seguro **por separado**. No subirla a GitHub.
 
 Restaurar el TAR original:
-```bash
+\`\`\`bash
 openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in "$encrypted" -out "$(basename "$SOURCE")" -pass file:CLAVE-PRIVADA.txt
 sha256sum "$(basename "$SOURCE")"
-```
+\`\`\`
 EOF
 
 cd "$temp"
