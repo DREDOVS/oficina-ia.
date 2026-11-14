@@ -28,14 +28,16 @@ login=$(gh api user --jq .login)
   echo "GitHub CLI conectado como $login, no DREDOVS. No se subira nada." >&2; exit 1;
 }
 
-if gh repo view "$TARGET" --json visibility --jq .visibility >/dev/null 2>&1; then
-  visibility=$(gh repo view "$TARGET" --json visibility --jq .visibility)
-  [[ "$visibility" == PRIVATE ]] || { echo "El repositorio existente es publico: $TARGET" >&2; exit 1; }
-else
-  gh repo create "$TARGET" --private --description "Respaldo cifrado Gas City y Beads"
-  visibility=$(gh repo view "$TARGET" --json visibility --jq .visibility)
-  [[ "$visibility" == PRIVATE ]] || { echo "No se pudo confirmar privacidad. Abortado." >&2; exit 1; }
+# El destino se crea en GitHub previamente. Nunca intentar crearlo con el token de Codespaces.
+if ! visibility=$(gh repo view "$TARGET" --json visibility --jq .visibility); then
+  echo "No hay acceso de GitHub CLI al repositorio privado $TARGET." >&2
+  echo "Revisa la autenticacion de gh y el acceso de la integracion a este repo." >&2
+  exit 1
 fi
+[[ "$visibility" == PRIVATE ]] || {
+  echo "El repositorio no es PRIVATE: $TARGET ($visibility). Abortado." >&2
+  exit 1
+}
 
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 branch="respaldo-$stamp"
